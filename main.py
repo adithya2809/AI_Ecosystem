@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pinecone import Pinecone,ServerlessSpec
-from gemini_client import text,embedding
+from gemini_client import text,embedding,client,types
 load_dotenv()
 
 pc=Pinecone(
@@ -21,7 +21,7 @@ print(pc.list_indexes())
 
 index=pc.Index("company-policies")
 
-index.upsert(
+""" index.upsert(
     vectors=[
         {
             "id":"chunk_001",
@@ -32,4 +32,20 @@ index.upsert(
         }
     ]
 )
-print("vector upserted successfully")
+print("vector upserted successfully") """
+
+query="How many vacation days do the employees get?"
+query_result=client.models.embed_content(
+    model="gemini-embedding-2",
+    contents=query,
+    config=types.EmbedContentConfig(
+        output_dimensionality=768
+    )
+)
+query_embedding=query_result.embeddings[0].values
+result=index.query(
+    vector=query_embedding,
+    top_k=1,
+    include_metadata=True
+)
+print(result)
