@@ -49,3 +49,17 @@ result=index.query(
     include_metadata=True
 )
 print(result)
+
+retrieved_text=result["matches"][0]["metadata"]["text"]
+
+prompt=f"""
+    Answer the user's question using only the provided context
+    context: {retrieved_text}
+    Question: {query}
+"""
+
+response=client.models.generate_content(
+    model="gemini-3.5-flash-lite",
+    contents=prompt
+)
+print(response.text)
