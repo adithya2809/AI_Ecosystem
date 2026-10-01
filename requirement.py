@@ -4,6 +4,8 @@ from pinecone import Pinecone,ServerlessSpec
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
+
 activities = [
     {
         "id": "1",
@@ -77,3 +79,20 @@ for activity in activities:
             }
         ]
     )
+
+user_interests=["adventure","beach"]
+query_text=f""" User is interested in: {",".join(user_interests)}
+"""
+query_result=client.models.embed_content(
+    model="gemini-embedding-2",
+    contents=query_text,
+    config=types.EmbedContentConfig(
+        output_dimensionality=768
+    )
+)
+query_embedding=query_result.embeddings[0].values
+result=index.query(vector=query_embedding,
+            top_k=3,
+            include_metadata=True
+            )
+print(result)
