@@ -1,5 +1,9 @@
 from gemini_client import client
 from google.genai import types
+from pinecone import Pinecone,ServerlessSpec
+import os
+from dotenv import load_dotenv
+load_dotenv()
 activities = [
     {
         "id": "1",
@@ -26,6 +30,20 @@ activities = [
         "cost": 1500
     }
 ]
+pc= Pinecone(
+        api_key=os.getenv("PINECONE_API_KEY")
+    )
+index_name="activities"
+""" pc.create_index(
+        name=index_name,
+        dimension=768,
+        metric="cosine",
+        spec=ServerlessSpec(
+            cloud="aws",
+            region="us-east-1"
+        )
+    ) """
+index=pc.Index("activities")
 
 for activity in activities:
     activity_text=f"""
@@ -42,5 +60,20 @@ for activity in activities:
     )
 
     embedding = result.embeddings[0].values
-
     print(activity["name"], "→", len(embedding))
+
+    index.upsert(
+        vectors=[
+            {
+                "id":activity["id"],
+                "values":embedding,
+                "metadata":{
+                    "text":activity_text,
+                    "name":activity["name"],
+                    "destination":activity["destination"],
+                    "cost":activity["cost"]
+                }
+
+            }
+        ]
+    )
