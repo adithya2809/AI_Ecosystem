@@ -98,15 +98,20 @@ result=index.query(vector=query_embedding,
 print(result)
 
 user_budget=1800
+user_detination="Goa"
+min_similarity=0.60
 recommendations=[]
 
 for match in result["matches"]:
 
-    if match["metadata"]["cost"] <=user_budget:
+    if match["metadata"]["cost"] <=user_budget and match["metadata"]["destination"].lower() ==user_detination.lower() and match["score"]>=min_similarity:
         recommendations.append({
             "name":match["metadata"]["name"]
             ,"score":match["score"],
             "cost":match["metadata"]["cost"],
             "destination":match["metadata"]["destination"]
         })
-print(recommendations)
+if not recommendations:
+    print("No suitable activities found. Try adjusting your budget or interests.")
+else:
+    print(recommendations)
