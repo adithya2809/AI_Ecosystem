@@ -96,3 +96,17 @@ result=index.query(vector=query_embedding,
             include_metadata=True
             )
 print(result)
+
+user_budget=1800
+recommendations=[]
+
+for match in result["matches"]:
+
+    if match["metadata"]["cost"] <=user_budget:
+        recommendations.append({
+            "name":match["metadata"]["name"]
+            ,"score":match["score"],
+            "cost":match["metadata"]["cost"],
+            "destination":match["metadata"]["destination"]
+        })
+print(recommendations)
