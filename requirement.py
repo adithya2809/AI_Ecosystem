@@ -115,3 +115,16 @@ if not recommendations:
     print("No suitable activities found. Try adjusting your budget or interests.")
 else:
     print(recommendations)
+
+def recommend_activities(user_interests,user_budget,user_destination):
+    query_text=f"User is interested in: {','.join(user_interests)}"
+
+    query_result=client.models.embed_content(
+        model="gemini-embedding-2",
+        contents=query_text,
+        config=types.EmbedContentConfig(
+            output_dimensionality=768
+        )
+    )
+
+    query_embedding=query_result.embeddings[0].values
